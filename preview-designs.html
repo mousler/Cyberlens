@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Cyberlens — Software UI Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#1a1a2e;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;font-family:'Inter',sans-serif}
+
+.app{width:1200px;height:720px;background:#13131f;border:1px solid #2a2a3e;border-radius:10px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,0.6)}
+
+/* ── Barre de titre OS ── */
+.titlebar{height:38px;background:#0e0e1a;border-bottom:1px solid #1e1e2e;display:flex;align-items:center;padding:0 16px;gap:8px;flex-shrink:0}
+.tb-dots{display:flex;gap:6px}
+.tb-dot{width:12px;height:12px;border-radius:50%}
+.tb-dot.red{background:#ff5f56}
+.tb-dot.yellow{background:#ffbd2e}
+.tb-dot.green{background:#27c93f}
+.tb-title{flex:1;text-align:center;font-size:11px;color:#3a3a5a;letter-spacing:.5px}
+.tb-right{display:flex;gap:12px;align-items:center}
+.tb-tag{font-size:9px;font-family:'JetBrains Mono';color:#3a3a5a;letter-spacing:1px}
+
+/* ── Toolbar ── */
+.toolbar{height:44px;background:#0f0f1c;border-bottom:1px solid #1e1e30;display:flex;align-items:center;padding:0 16px;gap:4px;flex-shrink:0}
+.tb-btn{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:6px;border:none;background:none;color:#5a5a7a;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s}
+.tb-btn:hover{background:#1e1e30;color:#a0a0c0}
+.tb-btn.active{background:#1a1a2e;color:#e0e0f0}
+.tb-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0}
+.tb-sep{width:1px;height:24px;background:#1e1e30;margin:0 4px}
+.tb-right-group{margin-left:auto;display:flex;align-items:center;gap:8px}
+.tb-input{background:#0a0a14;border:1px solid #1e1e30;border-radius:6px;color:#a0a0c0;font-family:'JetBrains Mono';font-size:11px;padding:5px 10px;outline:none;width:220px}
+.tb-input::placeholder{color:#3a3a5a}
+.tb-pill{font-family:'JetBrains Mono';font-size:9px;font-weight:600;padding:3px 8px;border-radius:20px;letter-spacing:.5px}
+.tb-pill.amber{background:rgba(245,158,11,.1);color:#F59E0B;border:1px solid rgba(245,158,11,.25)}
+.tb-pill.red{background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.25);animation:pulse 1.5s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* ── Body ── */
+.app-body{flex:1;display:flex;overflow:hidden}
+
+/* ── Sidebar ── */
+.sidebar{width:220px;background:#0c0c18;border-right:1px solid #1a1a2a;display:flex;flex-direction:column;flex-shrink:0}
+.sidebar-section{padding:12px 0 4px}
+.sidebar-label{font-size:9px;font-weight:600;letter-spacing:1.5px;color:#2e2e4a;text-transform:uppercase;padding:0 16px 6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:7px 16px;color:#4a4a6a;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;position:relative}
+.nav-item:hover{color:#8080a0;background:#10101e}
+.nav-item.active{color:#e0e0f5;background:linear-gradient(90deg,rgba(99,102,241,.12),transparent);border-left:2px solid #6366f1}
+.nav-item svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0}
+.nav-badge{margin-left:auto;font-family:'JetBrains Mono';font-size:8px;padding:2px 6px;border-radius:3px;background:#1a1a2a;color:#3a3a5a;border:1px solid #222236}
+.nav-badge.live{background:rgba(239,68,68,.1);color:#ef4444;border-color:rgba(239,68,68,.3);animation:pulse 1.5s ease infinite}
+.nav-badge.atk{background:rgba(239,68,68,.1);color:#ef4444;border-color:rgba(239,68,68,.25)}
+.nav-badge.def{background:rgba(59,130,246,.1);color:#3b82f6;border-color:rgba(59,130,246,.25)}
+
+.sidebar-footer{margin-top:auto;padding:14px 16px;border-top:1px solid #1a1a2a}
+.sf-row{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+.sf-dot{width:6px;height:6px;border-radius:50%;background:#27c93f;box-shadow:0 0 6px #27c93f;animation:pulse 2s ease infinite}
+.sf-text{font-family:'JetBrains Mono';font-size:9px;color:#3a3a5a}
+.sf-text span{color:#27c93f}
+
+/* ── Main ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* ── Status bar (bas de l'app) ── */
+.statusbar{height:24px;background:#080810;border-top:1px solid #1a1a2a;display:flex;align-items:center;padding:0 14px;gap:20px;flex-shrink:0}
+.sb-item{font-family:'JetBrains Mono';font-size:9px;color:#2e2e4a;display:flex;align-items:center;gap:5px}
+.sb-item.ok span{color:#27c93f}
+.sb-item.warn span{color:#F59E0B}
+.sb-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+
+/* ── Content ── */
+.content{flex:1;overflow:hidden;display:grid;grid-template-rows:auto 1fr;gap:0}
+
+/* ── Panel header ── */
+.panel-tabs{height:38px;background:#0e0e1a;border-bottom:1px solid #1a1a2a;display:flex;align-items:flex-end;padding:0 20px;gap:0;flex-shrink:0}
+.ptab{font-size:11px;font-weight:500;color:#3a3a5a;padding:0 16px 10px;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+.ptab.active{color:#a0a0d0;border-bottom-color:#6366f1}
+
+/* ── Dashboard layout ── */
+.dash{display:grid;grid-template-columns:280px 1fr;grid-template-rows:auto 1fr;gap:0;height:100%;overflow:hidden}
+
+/* Colonne gauche */
+.left-col{border-right:1px solid #1a1a2a;display:flex;flex-direction:column;overflow:hidden}
+
+/* Stats verticaux */
+.stat-list{padding:16px}
+.stat-item{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:6px;margin-bottom:8px;background:#0e0e1a;border:1px solid #1a1a2a;cursor:pointer;transition:border-color .15s}
+.stat-item:hover{border-color:#2e2e4a}
+.stat-item.active-stat{border-color:#6366f1;background:rgba(99,102,241,.06)}
+.stat-left{display:flex;flex-direction:column;gap:3px}
+.stat-label{font-size:10px;font-weight:600;color:#4a4a6a;letter-spacing:.3px}
+.stat-val{font-family:'JetBrains Mono';font-size:22px;font-weight:700;line-height:1}
+.stat-val.c{color:#ef4444}
+.stat-val.h{color:#f97316}
+.stat-val.m{color:#eab308}
+.stat-val.p{color:#a855f7}
+.stat-val.w{color:#e0e0f0}
+.stat-meta{font-family:'JetBrains Mono';font-size:9px;color:#2e2e4a}
+.stat-delta{font-family:'JetBrains Mono';font-size:9px;padding:2px 6px;border-radius:3px}
+.stat-delta.up{background:rgba(239,68,68,.1);color:#ef4444}
+.stat-delta.dn{background:rgba(39,201,63,.1);color:#27c93f}
+
+/* Colonne droite — feed + chart */
+.right-col{display:flex;flex-direction:column;overflow:hidden}
+
+.feed-header{height:38px;display:flex;align-items:center;padding:0 18px;border-bottom:1px solid #1a1a2a;gap:12px;flex-shrink:0}
+.feed-title{font-size:11px;font-weight:600;color:#5a5a7a;text-transform:uppercase;letter-spacing:.8px}
+.feed-count{font-family:'JetBrains Mono';font-size:10px;color:#3a3a5a}
+.feed-actions{margin-left:auto;display:flex;gap:6px}
+.fa-btn{font-size:10px;color:#3a3a5a;padding:3px 8px;border:1px solid #1e1e30;border-radius:4px;background:none;cursor:pointer;font-family:'JetBrains Mono'}
+.fa-btn.active{color:#6366f1;border-color:rgba(99,102,241,.4)}
+
+.feed-table{flex:1;overflow-y:auto}
+.feed-table::-webkit-scrollbar{width:4px}
+.feed-table::-webkit-scrollbar-track{background:#0a0a14}
+.feed-table::-webkit-scrollbar-thumb{background:#1e1e30;border-radius:2px}
+
+table{width:100%;border-collapse:collapse}
+thead{position:sticky;top:0;background:#0c0c18;z-index:1}
+th{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#2e2e4a;padding:8px 14px;text-align:left;border-bottom:1px solid #1a1a2a;white-space:nowrap}
+td{padding:9px 14px;font-size:11px;color:#5a5a7a;border-bottom:1px solid #0e0e1a;white-space:nowrap}
+tr:hover td{background:#0e0e1a}
+.cve-link{font-family:'JetBrains Mono';font-size:11px;color:#6366f1;font-weight:500}
+.badge{font-family:'JetBrains Mono';font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;letter-spacing:.3px}
+.badge.CRITICAL{background:rgba(239,68,68,.12);color:#ef4444;border:1px solid rgba(239,68,68,.25)}
+.badge.HIGH{background:rgba(249,115,22,.12);color:#f97316;border:1px solid rgba(249,115,22,.2)}
+.badge.MEDIUM{background:rgba(234,179,8,.1);color:#eab308;border:1px solid rgba(234,179,8,.2)}
+.badge.LOW{background:rgba(39,201,63,.1);color:#27c93f;border:1px solid rgba(39,201,63,.2)}
+.badge.NONE{background:#0e0e1a;color:#3a3a5a;border:1px solid #1a1a2a}
+.kev-badge{font-family:'JetBrains Mono';font-size:8px;padding:1px 5px;border-radius:2px;background:rgba(168,85,247,.1);color:#a855f7;border:1px solid rgba(168,85,247,.25)}
+.score{font-family:'JetBrains Mono';font-size:12px;font-weight:600}
+.score.c{color:#ef4444}
+.score.h{color:#f97316}
+.score.m{color:#eab308}
+
+/* Bottom row */
+.bottom-row{display:contents}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Titlebar -->
+  <div class="titlebar">
+    <div class="tb-dots">
+      <div class="tb-dot red"></div>
+      <div class="tb-dot yellow"></div>
+      <div class="tb-dot green"></div>
+    </div>
+    <div class="tb-title">Cyberlens — Threat Intelligence Platform</div>
+    <div class="tb-right">
+      <span class="tb-tag">v2.4.1</span>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <button class="tb-btn active">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Overview
+    </button>
+    <button class="tb-btn">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      CVE Search
+    </button>
+    <button class="tb-btn">
+      <svg viewBox="0 0 24 24"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44"/></svg>
+      Simulator
+    </button>
+    <div class="tb-sep"></div>
+    <button class="tb-btn" style="color:#ef4444">
+      <svg viewBox="0 0 24 24"><path d="m14.5 12.5-8 8a2.119 2.119 0 0 1-3-3l8-8"/><path d="m16 16 6-6"/></svg>
+      Red Team
+    </button>
+    <button class="tb-btn" style="color:#3b82f6">
+      <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+      Blue Team
+    </button>
+    <div class="tb-sep"></div>
+    <div class="tb-right-group">
+      <input class="tb-input" placeholder="🔍  Rechercher CVE-XXXX-XXXXX, apache, log4j…">
+      <div class="tb-pill amber">TLP:AMBER</div>
+      <div class="tb-pill red">● ELEVATED</div>
+    </div>
+  </div>
+
+  <!-- App body -->
+  <div class="app-body">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Workspace</div>
+        <div class="nav-item active">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Dashboard
+        </div>
+        <div class="nav-item">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          CVE Search
+          <span class="nav-badge">NVD</span>
+        </div>
+        <div class="nav-item">
+          <svg viewBox="0 0 24 24"><path d="M4 22h16a2 2 0 0 0 2-2V4"/><path d="M18 14h-8"/><path d="M15 18h-5"/></svg>
+          Threat News
+          <span class="nav-badge live">LIVE</span>
+        </div>
+        <div class="nav-item">
+          <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="m8 21 4-4 4 4"/></svg>
+          Simulator
+        </div>
+        <div class="nav-item">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20"/><path d="M2 12h20"/></svg>
+          Threat Map
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Perspectives</div>
+        <div class="nav-item">
+          <svg viewBox="0 0 24 24"><path d="m14.5 12.5-8 8a2.119 2.119 0 0 1-3-3l8-8"/><path d="m16 16 6-6"/></svg>
+          Red Team
+          <span class="nav-badge atk">ATK</span>
+        </div>
+        <div class="nav-item">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+          Blue Team
+          <span class="nav-badge def">DEF</span>
+        </div>
+      </div>
+      <div class="sidebar-footer">
+        <div class="sf-row">
+          <div class="sf-dot"></div>
+          <span class="sf-text">NVD · KEV · <span>ONLINE</span></span>
+        </div>
+        <div class="sf-text" style="font-size:8px">SESSION 00:14:22 · SID:A4F2B1</div>
+      </div>
+    </div>
+
+    <!-- Main area -->
+    <div class="main">
+
+      <!-- Panel tabs -->
+      <div class="panel-tabs">
+        <div class="ptab active">Vue d'ensemble</div>
+        <div class="ptab">Activité récente</div>
+        <div class="ptab">Alertes KEV</div>
+        <div class="ptab">Statistiques</div>
+      </div>
+
+      <!-- Dashboard grid -->
+      <div class="dash">
+
+        <!-- Left col: stats -->
+        <div class="left-col">
+          <div class="stat-list">
+            <div class="stat-item active-stat">
+              <div class="stat-left">
+                <div class="stat-label">TOTAL CVEs</div>
+                <div class="stat-val w">190 941</div>
+                <div class="stat-meta">Toutes sévérités · Base NVD</div>
+              </div>
+              <span class="stat-delta dn">↓ stable</span>
+            </div>
+            <div class="stat-item">
+              <div class="stat-left">
+                <div class="stat-label">CRITIQUES</div>
+                <div class="stat-val c">30 117</div>
+                <div class="stat-meta">CVSS ≥ 9.0</div>
+              </div>
+              <span class="stat-delta up">▲ +214</span>
+            </div>
+            <div class="stat-item">
+              <div class="stat-left">
+                <div class="stat-label">HAUTES</div>
+                <div class="stat-val h">75 697</div>
+                <div class="stat-meta">CVSS 7.0–8.9</div>
+              </div>
+              <span class="stat-delta up">▲ +89</span>
+            </div>
+            <div class="stat-item">
+              <div class="stat-left">
+                <div class="stat-label">MOYENNES</div>
+                <div class="stat-val m">81 759</div>
+                <div class="stat-meta">CVSS 4.0–6.9</div>
+              </div>
+              <span class="stat-delta dn">↓ —</span>
+            </div>
+            <div class="stat-item">
+              <div class="stat-left">
+                <div class="stat-label">KEV — EXPLOITÉES</div>
+                <div class="stat-val p">1 579</div>
+                <div class="stat-meta">CISA Known Exploited</div>
+              </div>
+              <span class="stat-delta up">▲ +7</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right col: table -->
+        <div class="right-col">
+          <div class="feed-header">
+            <div class="feed-title">CVEs Récentes</div>
+            <div class="feed-count">38 résultats · 24h</div>
+            <div class="feed-actions">
+              <button class="fa-btn active">Toutes</button>
+              <button class="fa-btn">Critiques</button>
+              <button class="fa-btn">KEV</button>
+            </div>
+          </div>
+          <div class="feed-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>CVE ID</th>
+                  <th>CVSS</th>
+                  <th>SÉVÉRITÉ</th>
+                  <th>PRODUIT</th>
+                  <th>DESCRIPTION</th>
+                  <th>PUBLIÉ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><span class="cve-link">CVE-2026-3960</span></td><td><span class="score m">5.9</span></td><td><span class="badge MEDIUM">MEDIUM</span></td><td style="color:#4a4a6a">–</td><td style="color:#4a4a6a;max-width:280px;overflow:hidden;text-overflow:ellipsis">Buffer overflow in network stack</td><td style="font-family:'JetBrains Mono';font-size:10px">23 avr. 2026</td></tr>
+                <tr><td><span class="cve-link">CVE-2026-5464</span></td><td><span class="score h">7.2</span></td><td><span class="badge HIGH">HIGH</span></td><td style="color:#4a4a6a">Apache</td><td style="color:#4a4a6a">Remote code execution via path traversal</td><td style="font-family:'JetBrains Mono';font-size:10px">23 avr. 2026</td></tr>
+                <tr style="background:rgba(239,68,68,.03)"><td><span class="cve-link">CVE-2026-2011</span></td><td><span class="score c">9.1</span></td><td><span class="badge CRITICAL">CRITICAL</span> <span class="kev-badge">KEV</span></td><td style="color:#4a4a6a">Microsoft</td><td style="color:#4a4a6a">Pre-auth RCE in Exchange Server</td><td style="font-family:'JetBrains Mono';font-size:10px">22 avr. 2026</td></tr>
+                <tr><td><span class="cve-link">CVE-2026-1847</span></td><td><span class="score h">8.1</span></td><td><span class="badge HIGH">HIGH</span></td><td style="color:#4a4a6a">Cisco</td><td style="color:#4a4a6a">Authentication bypass in IOS XE</td><td style="font-family:'JetBrains Mono';font-size:10px">22 avr. 2026</td></tr>
+                <tr><td><span class="cve-link">CVE-2026-0933</span></td><td><span class="score m">6.5</span></td><td><span class="badge MEDIUM">MEDIUM</span></td><td style="color:#4a4a6a">Linux</td><td style="color:#4a4a6a">Privilege escalation via kernel race condition</td><td style="font-family:'JetBrains Mono';font-size:10px">21 avr. 2026</td></tr>
+                <tr style="background:rgba(239,68,68,.03)"><td><span class="cve-link">CVE-2026-0741</span></td><td><span class="score c">9.8</span></td><td><span class="badge CRITICAL">CRITICAL</span> <span class="kev-badge">KEV</span></td><td style="color:#4a4a6a">Fortinet</td><td style="color:#4a4a6a">SSL-VPN heap overflow, unauthenticated RCE</td><td style="font-family:'JetBrains Mono';font-size:10px">21 avr. 2026</td></tr>
+                <tr><td><span class="cve-link">CVE-2026-0512</span></td><td><span class="score m">5.3</span></td><td><span class="badge MEDIUM">MEDIUM</span></td><td style="color:#4a4a6a">VMware</td><td style="color:#4a4a6a">Information disclosure in vCenter</td><td style="font-family:'JetBrains Mono';font-size:10px">20 avr. 2026</td></tr>
+                <tr><td><span class="cve-link">CVE-2026-0388</span></td><td><span class="score h">7.5</span></td><td><span class="badge HIGH">HIGH</span></td><td style="color:#4a4a6a">Palo Alto</td><td style="color:#4a4a6a">DoS via malformed packet in PAN-OS</td><td style="font-family:'JetBrains Mono';font-size:10px">20 avr. 2026</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Status bar -->
+  <div class="statusbar">
+    <div class="sb-item ok"><div class="sb-dot" style="background:#27c93f"></div>NVD API <span>connecté</span></div>
+    <div class="sb-item ok"><div class="sb-dot" style="background:#27c93f"></div>CISA KEV <span>sync</span></div>
+    <div class="sb-item warn"><div class="sb-dot" style="background:#F59E0B"></div>Threat level <span>ELEVATED</span></div>
+    <div class="sb-item" style="margin-left:auto">
+      <span style="color:#2e2e4a">EVENTS: <span style="color:#6366f1">1 605</span> · SESSION: <span style="color:#3a3a5a">00:14:22</span> · v2.4.1</span>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

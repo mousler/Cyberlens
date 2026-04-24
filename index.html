@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Cyberlens — Plateforme de Veille & Analyse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/powershell.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/java.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/c.min.js"></script>
+  <link rel="stylesheet" href="css/style.css?v=10">
+</head>
+<body>
+  <div id="app">
+
+    <!-- Sidebar -->
+    <nav id="sidebar" class="sidebar expanded">
+      <div class="sidebar-header">
+        <div class="logo">
+          <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+            <!-- Cercle externe — lentille -->
+            <circle cx="15" cy="15" r="13" stroke="#00d4ff" stroke-width="1.5" fill="none"/>
+            <!-- Lentille interne -->
+            <circle cx="15" cy="15" r="7" stroke="#00d4ff" stroke-width="1.2" fill="#00d4ff11"/>
+            <!-- Réflexion lentille -->
+            <circle cx="15" cy="15" r="7" stroke="#00d4ff" stroke-width="1.2" fill="none"/>
+            <!-- Crosshair horizontal -->
+            <line x1="2" y1="15" x2="8"  y2="15" stroke="#00d4ff" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="22" y1="15" x2="28" y2="15" stroke="#00d4ff" stroke-width="1.2" stroke-linecap="round"/>
+            <!-- Crosshair vertical -->
+            <line x1="15" y1="2"  x2="15" y2="8"  stroke="#00d4ff" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="15" y1="22" x2="15" y2="28" stroke="#00d4ff" stroke-width="1.2" stroke-linecap="round"/>
+            <!-- Point focal -->
+            <circle cx="15" cy="15" r="2.5" fill="#00d4ff"/>
+            <!-- Reflet lumineux -->
+            <circle cx="11.5" cy="11.5" r="1.2" fill="#00d4ff" opacity="0.5"/>
+          </svg>
+          <div class="logo-text">Cyber<span class="logo-accent">lens</span></div>
+        </div>
+        <button id="sidebar-toggle" class="sidebar-toggle" title="Toggle sidebar">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M11 2L5 8l6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="system-status">
+        <div class="status-indicator online"></div>
+        <span class="status-text">NVD</span>
+        <div class="status-indicator online" style="margin-left:4px"></div>
+        <span class="status-text">KEV</span>
+        <div class="status-indicator online" style="margin-left:4px"></div>
+        <span class="status-text">OSINT</span>
+      </div>
+
+      <ul class="nav-list">
+        <li>
+          <a class="nav-item active" data-view="dashboard" href="#">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+              <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+            </svg>
+            <span class="nav-label">Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" data-view="cve" href="#">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+            <span class="nav-label">CVE Search</span>
+            <span class="nav-badge" id="badge-cve">NVD</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" data-view="exploit" href="#">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2"/>
+              <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2"/>
+            </svg>
+            <span class="nav-label">Exploit Lab</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" data-view="news" href="#">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/>
+              <path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/>
+            </svg>
+            <span class="nav-label">Threat News</span>
+            <span class="nav-badge live" id="badge-live">LIVE</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" data-view="simulator" href="#">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <rect x="2" y="3" width="20" height="14" rx="2"/>
+              <path d="m8 21 4-4 4 4"/><path d="M7 8l3 3-3 3"/><path d="M13 14h4"/>
+            </svg>
+            <span class="nav-label">Simulator</span>
+            <span class="nav-badge" style="background:rgba(168,85,247,0.2);color:#a855f7;border-color:rgba(168,85,247,0.4)">SIM</span>
+          </a>
+        </li>
+
+        <li class="nav-separator"><span>PERSPECTIVES</span></li>
+
+        <li>
+          <a class="nav-item" data-view="redteam" href="#">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="m14.5 12.5-8 8a2.119 2.119 0 0 1-3-3l8-8"/>
+              <path d="m16 16 6-6"/><path d="m8 8 6-6"/><path d="m9 7 8 8"/>
+              <path d="m21 11-8-8"/>
+            </svg>
+            <span class="nav-label">Red Team</span>
+            <span class="nav-badge red">ATK</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" data-view="blueteam" href="#">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>
+              <path d="m9 12 2 2 4-4"/>
+            </svg>
+            <span class="nav-label">Blue Team</span>
+            <span class="nav-badge blue">DEF</span>
+          </a>
+        </li>
+
+        <li class="nav-separator"><span>OUTILS</span></li>
+
+        <li>
+          <a class="nav-item" data-view="threat-map" href="#">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+              <path d="M2 12h20"/>
+            </svg>
+            <span class="nav-label">Threat Map</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" data-view="settings" href="#">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <span class="nav-label">Paramètres</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-footer-row">
+          <div class="api-status" id="api-status">
+            <div class="api-dot"></div>
+            <span>NVD API</span>
+          </div>
+          <div class="clock" id="clock"></div>
+        </div>
+        <div class="sidebar-footer-row">
+          <span class="sidebar-version">v2.4 · <span id="session-id">SID:----</span></span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main -->
+    <div class="main-wrapper">
+      <!-- Top bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-menu-btn" id="mobile-menu-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+              <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </button>
+          <div class="breadcrumb">
+            <span class="breadcrumb-root">Cyberlens</span>
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-current" id="breadcrumb-current">Dashboard</span>
+          </div>
+        </div>
+        <div class="ticker-wrapper">
+          <div class="ticker-label">ALERTES</div>
+          <div class="ticker-track" id="ticker-track">
+            <span class="ticker-item">Chargement des alertes...</span>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <div class="event-counter" title="Événements traités cette session">
+            <span class="event-counter-label">EVENTS</span>
+            <span class="event-counter-val" id="event-counter">0</span>
+          </div>
+          <div class="session-timer" title="Durée de la session">
+            <span class="session-label">SESSION</span>
+            <span class="session-time" id="session-time">00:00:00</span>
+          </div>
+          <span class="tlp-badge" title="Traffic Light Protocol">TLP:AMBER</span>
+          <button class="topbar-btn" id="refresh-btn" title="Rafraîchir">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+              <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+              <path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+              <path d="M8 16H3v5"/>
+            </svg>
+          </button>
+          <div class="threat-level" id="threat-level">
+            <div class="threat-dot"></div>
+            <span>ELEVATED</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <main id="content" class="content"></main>
+    </div>
+
+  </div>
+
+  <!-- Toast notifications -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Loading overlay -->
+  <div id="loading-overlay" class="loading-overlay hidden">
+    <div class="loading-spinner">
+      <div class="spinner-ring"></div>
+      <div class="spinner-text">Chargement...</div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js?v=15"></script>
+</body>
+</html>
